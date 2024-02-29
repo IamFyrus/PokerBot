@@ -78,14 +78,24 @@ class Player(Bot):
 
         Returns:
         Your action.
+        '''
         
+        street = round_state.street  # 0, 3, 4, or 5 representing pre-flop, flop, turn, or river respectively
+        my_cards = round_state.hands[active]  # your cards
+        board_cards = round_state.deck[:street]  # the board cards
+        my_pip = round_state.pips[active]  # the number of chips you have contributed to the pot this round of betting
+        opp_pip = round_state.pips[1-active]  # the number of chips your opponent has contributed to the pot this round of betting
+        my_stack = round_state.stacks[active]  # the number of chips you have remaining
+        opp_stack = round_state.stacks[1-active]  # the number of chips your opponent has remaining
+        continue_cost = opp_pip - my_pip  # the number of chips needed to stay in the pot
+        my_contribution = STARTING_STACK - my_stack  # the number of chips you have contributed to the pot
+        opp_contribution = STARTING_STACK - opp_stack  # the number of chips your opponent has contributed to the pot
         suited = False
         pocket_pair = False
         good_pocket_pair = False
         fuckisthis = False
         flush = False
         my_cards_greater = True
-        '''
         my_bankroll = game_state.bankroll
         legal_actions = round_state.legal_actions()
 
@@ -93,67 +103,77 @@ class Player(Bot):
         my_cards = list(map(eval7.Card, my_cards))
 
         
-        if round_state.street == 0:
+        if street == 0:
             if my_cards[0].rank == my_cards[1].rank:
-           #     pocket_pair = True
+                pocket_pair = True
                 if my_cards[0].rank > 9:
-                   # good_pocket_pair = True
+                    good_pocket_pair = True
                     if(max_raise != min_raise):
-                        return RaiseAction(3)
+                        return RaiseAction(5)
                     elif CallAction in legal_actions:
                         return CallAction()
                     else:
                         return CheckAction()
             elif my_cards[0].suit == my_cards[1].suit:
-          #      suited = True
+                suited = True
                 if (my_cards[0].rank > 10) & (my_cards[1].rank > 10):
                     return RaiseAction(3)
                 elif CheckAction in legal_actions:
                     return CheckAction()
-                elif :
+                elif continue_cost <= 3:
                     return CallAction()
             elif my_cards[0].rank < 10 & my_cards[1].rank < 10:
-         #       fuckisthis = True
+                fuckisthis = True
                 if CheckAction in legal_actions:
                     return CheckAction()
                 else:
                     return FoldAction()
 
-        '''
-        if round_state.street == 3:    
+        
+        if street == 3:    
             if fuckisthis:
                 if CheckAction in legal_actions:
                     return CheckAction()
                 else:
                     return FoldAction()
 
-            if suited:
-                if round_state.street[0].suit == my_cards[0].suit:
-                    if round_state.street[0].suit == round_state.street[1].suit:
+            elif suited:
+                if board_cards[0].suit == board_cards[0].suit:
+                    if board_cards[0].suit == board_cards[1].suit:
                         flushdraw = True
-                        if round_state.street[0].suit == round_state.street[2].suit:
+                        if board_cards[0].suit == board_cards[2].suit:
                             flush = True
-                            return RaiseAction(max_raise)
-                        else:
                             return RaiseAction(max_raise/8)
                     elif CheckAction in legal_actions:
                         return CheckAction
-                    elif bet_amt < (max_raise/16):
+                    elif continue_cost < (my_stack/3):
                         return CallAction()
-            if pocket_pair:
-                for i in round_state.street:
-                    if round_state.street[i].rank == my_cards[0].rank:
-                        return RaiseAction(max_raise/4)
-                    if round_state.street[i].rank > my_cards[0].rank:
+                    else:
+                        if random.sample(100, 1) == 1:
+                            return RaiseAction(max_raise)
+                        else:
+                            return FoldAction()
+            elif pocket_pair:
+                for i in street:
+                    if board_cards[i].rank == my_cards[0].rank:
+                        return RaiseAction(my_contribution + opp_contribution)
+                    if board_cards[i].rank > my_cards[0].rank:
                         my_cards_greater = False
                 if my_cards_greater:
-                    return RaiseAction(max_raise/8)
+                    return RaiseAction(10)
                 elif good_pocket_pair:
                     if CallAction in legal_actions:
                         return CallAction()
                     else:
                         return CheckAction()
-'''
+                else:
+                    if continue_cost < 20:
+                        return CallAction()
+                    else:
+                        return FoldAction()    
+                
+            
+
                 
                     
             
