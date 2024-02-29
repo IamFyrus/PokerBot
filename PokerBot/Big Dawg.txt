@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\psych\PokerBotExamples\mybot\player.py", line 176, in <module>
+    run_bot(Player(), parse_args())
+  File "C:\Users\psych\PokerBotExamples\mybot\skeleton\runner.py", line 130, in run_bot
+    runner.run()
+  File "C:\Users\psych\PokerBotExamples\mybot\skeleton\runner.py", line 105, in run
+    action = self.pokerbot.get_action(game_state, round_state, active)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\psych\PokerBotExamples\mybot\player.py", line 112, in get_action
+    elif bet_amt.size() < (max_raise/10):
+         ^^^^^^^
+UnboundLocalError: cannot access local variable 'bet_amt' where it is not associated with a value
